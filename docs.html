@@ -287,6 +287,28 @@
       color: var(--accent);
     }
 
+    /* Download button */
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 1.25rem;
+      font-weight: 600;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      margin: 1.5rem 0 2rem;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .download-btn:hover {
+      opacity: 0.95;
+      transform: translateY(-2px);
+    }
+
     /* Footer */
     footer {
       margin-top: 4rem;
@@ -358,31 +380,42 @@
 
           <h2>Installation</h2>
 
+          <p>Download DeepCLI from GitHub Releases, then unzip and add the folder to your PATH.</p>
+
+          <a href="https://github.com/wassi-real/DeepCLI/releases" target="_blank" rel="noopener" class="download-btn">Download from GitHub Releases</a>
+
           <div class="steps">
             <div class="step">
               <span class="step-number">1</span>
-              <div class="step-title">Download the executable</div>
+              <div class="step-title">Download and unzip</div>
               <p style="margin-top: 1rem;">
-                Download <code>deepcli.exe</code> from the <a href="https://github.com/your-repo/deepcli/releases" target="_blank">GitHub Releases page</a>.
+                Click the button above to open <a href="https://github.com/wassi-real/DeepCLI/releases" target="_blank" rel="noopener">GitHub Releases</a>, download the Windows build (e.g. <code>deepcli-x.x.x-x86_64-pc-windows-msvc.zip</code>), and unzip it to a folder (e.g. <code>C:\deepcli</code>).
               </p>
             </div>
 
             <div class="step">
               <span class="step-number">2</span>
-              <div class="step-title">Add to PATH</div>
+              <div class="step-title">Add the folder to PATH (Windows)</div>
               <p style="margin-top: 1rem;">
-                Move <code>deepcli.exe</code> to any directory in your system PATH, or add its location to PATH. Common locations:
+                Add the unzipped folder to your PATH using environment variables so you can run <code>deepcli</code> from any terminal:
               </p>
-              <pre><code>C:\Program Files\deepcli\deepcli.exe
-# or add to PATH:
-setx PATH "%PATH%;C:\path\to\deepcli"</code></pre>
+              <ul style="margin-top: 0.75rem;">
+                <li>Press <strong>Win + R</strong>, type <code>sysdm.cpl</code>, press Enter.</li>
+                <li>Open the <strong>Advanced</strong> tab → <strong>Environment Variables</strong>.</li>
+                <li>Under <strong>User variables</strong> (or System), select <strong>Path</strong> → <strong>Edit</strong>.</li>
+                <li>Click <strong>New</strong> and add the full path to the folder (e.g. <code>C:\deepcli</code>).</li>
+                <li>Click OK to close all dialogs. Open a <em>new</em> terminal for the change to apply.</li>
+              </ul>
+              <p style="margin-top: 1rem;">Or via Command Prompt (run as Administrator if needed):</p>
+              <pre><code>setx PATH "%PATH%;C:\deepcli"</code></pre>
+              <p style="margin-top: 0.5rem; font-size: 0.95rem; color: var(--text-muted);">Replace <code>C:\deepcli</code> with the path where you unzipped DeepCLI.</p>
             </div>
 
             <div class="step">
               <span class="step-number">3</span>
               <div class="step-title">Verify installation</div>
               <p style="margin-top: 1rem;">
-                Open a new terminal and verify:
+                Open a new terminal and run:
               </p>
               <pre><code>deepcli --version</code></pre>
             </div>
