@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepCLI — AI agents in your terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0c0f;
+      --surface: #141418;
+      --text: #e8e8ec;
+      --text-muted: #88889a;
+      --accent: #ffffff;
+      --accent-dim: rgba(255, 255, 255, 0.15);
+      --border: #2a2a32;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+    }
+
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 1.5rem 5rem;
+    }
+
+    .hero-logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 1.25rem;
+      object-fit: contain;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.25rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .hero .tagline {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 420px;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero .about {
+      max-width: 520px;
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: var(--bg);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.85rem 1.75rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--accent-dim);
+    }
+
+    .footer {
+      padding: 1.5rem 1.5rem 2rem;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .footer .made-by {
+      margin-bottom: 0.35rem;
+    }
+
+    .footer .powered {
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <img src="DeepCLI.png" alt="DeepCLI" class="hero-logo">
+    <h1><span>DeepCLI</span></h1>
+    <p class="tagline">A simple AI agent that runs in the terminal.</p>
+    <p class="about">
+      Chat with AI, manage multiple agents, and keep context in projects—all from the command line. No browser, no extra apps. Just your terminal and your agents.
+    </p>
+    <a href="docs.html" class="cta">Docs →</a>
+  </section>
+
+  <footer class="footer">
+    <p class="made-by">Made by <a href="https://alwassikhan.com" target="_blank" rel="noopener">Al Wassi Khan</a></p>
+    <p class="powered">Powered by <a href="https://softodesign.com" target="_blank" rel="noopener">softodesign.com</a></p>
+  </footer>
+</body>
+</html>

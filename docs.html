@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepCLI — Documentation</title>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --bg-sidebar: #111111;
+      --bg-card: #1a1a1a;
+      --bg-hover: #222222;
+      --text: #e0e0e0;
+      --text-muted: #888888;
+      --accent: #ffffff;
+      --accent-hover: #e0e0e0;
+      --border: #333333;
+      --shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 2rem 1.5rem;
+      z-index: 1000;
+    }
+
+    .sidebar-header {
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-logo-link {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-logo {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .tagline {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .nav-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .nav-link {
+      display: block;
+      padding: 0.6rem 1rem;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 6px;
+      margin-bottom: 0.25rem;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .nav-link:hover {
+      background: var(--bg-hover);
+      color: var(--text);
+    }
+
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: 280px;
+      padding: 3rem 4rem;
+      max-width: 1200px;
+    }
+
+    .content-wrapper {
+      max-width: 800px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    h2 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      margin: 3rem 0 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
+      color: var(--text);
+    }
+
+    p {
+      margin-bottom: 1.25rem;
+      color: var(--text);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    a:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
+
+    /* Code Blocks */
+    pre, code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    }
+
+    code {
+      background: var(--bg-card);
+      padding: 0.2em 0.5em;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #e2e8f0;
+    }
+
+    pre {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin: 1.25rem 0;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 6px var(--shadow);
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      border: none;
+      color: var(--text);
+    }
+
+    /* Command Cards */
+    .cmd-grid {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .cmd {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px var(--shadow);
+    }
+
+    .cmd:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .cmd-name {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .cmd-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Steps */
+    .steps {
+      margin: 1.5rem 0;
+    }
+
+    .step {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px var(--shadow);
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-right: 0.75rem;
+    }
+
+    .step-title {
+      display: inline-block;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+    }
+
+    /* Lists */
+    ul {
+      margin: 1rem 0;
+      padding-left: 1.75rem;
+    }
+
+    li {
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    li::marker {
+      color: var(--accent);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-content {
+        padding: 2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 1.5rem;
+      }
+      h1 {
+        font-size: 2.5rem;
+      }
+      h2 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo-link">
+          <img src="DeepCLI.png" alt="DeepCLI" class="sidebar-logo">
+        </a>
+        <div class="logo">DeepCLI</div>
+        <p class="tagline">AI Agent Management CLI</p>
+      </div>
+      <nav>
+        <div class="nav-section">
+          <div class="nav-title">Getting Started</div>
+          <a href="#install" class="nav-link">Installation</a>
+          <a href="#setup" class="nav-link">Setup</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-title">Commands</div>
+          <a href="#commands" class="nav-link">Core Commands</a>
+          <a href="#agent" class="nav-link">Agent Commands</a>
+          <a href="#project" class="nav-link">Projects</a>
+          <a href="#multichat" class="nav-link">Multichat</a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="content-wrapper">
+        <section id="install">
+          <h1>DeepCLI</h1>
+          <p style="font-size: 1.25rem; color: var(--text-muted); margin-bottom: 2rem;">
+            Run, chat, and control LLM agents from one powerful command-line tool
+          </p>
+
+          <h2>Installation</h2>
+
+          <div class="steps">
+            <div class="step">
+              <span class="step-number">1</span>
+              <div class="step-title">Download the executable</div>
+              <p style="margin-top: 1rem;">
+                Download <code>deepcli.exe</code> from the <a href="https://github.com/your-repo/deepcli/releases" target="_blank">GitHub Releases page</a>.
+              </p>
+            </div>
+
+            <div class="step">
+              <span class="step-number">2</span>
+              <div class="step-title">Add to PATH</div>
+              <p style="margin-top: 1rem;">
+                Move <code>deepcli.exe</code> to any directory in your system PATH, or add its location to PATH. Common locations:
+              </p>
+              <pre><code>C:\Program Files\deepcli\deepcli.exe
+# or add to PATH:
+setx PATH "%PATH%;C:\path\to\deepcli"</code></pre>
+            </div>
+
+            <div class="step">
+              <span class="step-number">3</span>
+              <div class="step-title">Verify installation</div>
+              <p style="margin-top: 1rem;">
+                Open a new terminal and verify:
+              </p>
+              <pre><code>deepcli --version</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section id="setup">
+          <h2>Setup</h2>
+          <p>Run <code>deepcli init</code> once to configure DeepCLI. You'll be prompted for:</p>
+          <ul>
+            <li><strong>API key</strong> — Get one at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a>. Copy it and press Enter at the prompt to use clipboard if paste doesn't work.</li>
+            <li><strong>Model</strong> — Pick from the list or type a custom model name.</li>
+            <li><strong>Agent name</strong> — Name your first agent (e.g., <code>assistant</code>).</li>
+          </ul>
+          <pre><code>deepcli init</code></pre>
+        </section>
+
+        <section id="commands">
+          <h2>Core Commands</h2>
+
+          <div class="cmd-grid">
+            <div class="cmd">
+              <span class="cmd-name">deepcli init</span>
+              <span class="cmd-desc">Set up DeepCLI (API key, model, first agent). Run this first.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli chat [agent] [--project NAME]</span>
+              <span class="cmd-desc">Interactive chat with an agent. Use --project to save chat history and context.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli multichat [--count N] [--project NAME]</span>
+              <span class="cmd-desc">Split-screen chat with multiple agents. Use <code>--project &lt;name&gt;</code> to load and save chat history. Tab to switch lanes, Enter to send.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli ask &lt;agent&gt; "&lt;message&gt;"</span>
+              <span class="cmd-desc">Send a single message and print the response.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli model</span>
+              <span class="cmd-desc">Interactively change the model for an agent.</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="agent">
+          <h2>Agent Commands</h2>
+
+          <div class="cmd-grid">
+            <div class="cmd">
+              <span class="cmd-name">deepcli agent new</span>
+              <span class="cmd-desc">Create a new agent interactively (prompts for name, model, workdir).</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli agent create &lt;name&gt; [--model M] [--workdir W] [--prompt P]</span>
+              <span class="cmd-desc">Create a new agent with arguments.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli agent set &lt;name&gt; [--model M] [--workdir W] [--prompt P]</span>
+              <span class="cmd-desc">Update an existing agent.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli agent remove &lt;name&gt;</span>
+              <span class="cmd-desc">Remove an agent.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli agent list</span>
+              <span class="cmd-desc">List all agents.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli agent show &lt;name&gt;</span>
+              <span class="cmd-desc">Show agent details.</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="project">
+          <h2>Projects</h2>
+          <p>Projects allow you to maintain chat history and context across multiple sessions. When you create a project, all conversations are saved automatically, letting you reference previous discussions with AI.</p>
+
+          <div class="cmd-grid">
+            <div class="cmd">
+              <span class="cmd-name">deepcli project new</span>
+              <span class="cmd-desc">Create a new project interactively (prompts for name, description, agent).</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli project create &lt;name&gt;</span>
+              <span class="cmd-desc">Create a new project with a name.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli project list</span>
+              <span class="cmd-desc">List all projects.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli project show &lt;name&gt;</span>
+              <span class="cmd-desc">Show project details and chat history count.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli project remove &lt;name&gt;</span>
+              <span class="cmd-desc">Remove a project (also deletes chat history).</span>
+            </div>
+          </div>
+
+          <h3>Using Projects</h3>
+          <p>Start a project-based chat session:</p>
+          <pre><code>deepcli chat --project my-project</code></pre>
+
+          <p>This will:</p>
+          <ul>
+            <li>Load previous chat history from the project</li>
+            <li>Save all new messages to the project's history</li>
+            <li>Allow the AI to reference earlier conversations in the same project</li>
+          </ul>
+
+          <p>Regular chat (without --project) doesn't save history and starts fresh each time.</p>
+        </section>
+
+        <section id="multichat">
+          <h2>Multichat</h2>
+          <p>Multichat opens a split-screen terminal where each agent has its own lane. Perfect for comparing outputs or brainstorming with multiple AI perspectives simultaneously.</p>
+
+          <h3>Project mode</h3>
+          <p>Use <code>--project &lt;name&gt;</code> (or <code>-p &lt;name&gt;</code>) to attach multichat to a project. You must provide the project name; <code>--project</code> alone is invalid.</p>
+          <ul>
+            <li>Chat history for the project is loaded into all agent lanes at start.</li>
+            <li>Conversations are saved to the project for use in future sessions.</li>
+          </ul>
+
+          <h3>Keyboard Shortcuts</h3>
+          <ul>
+            <li><strong>Tab</strong> — Switch to next agent lane</li>
+            <li><strong>Shift+Tab</strong> — Switch to previous agent lane</li>
+            <li><strong>Enter</strong> — Send message to the focused agent</li>
+            <li><strong>↑↓</strong> — Scroll chat history</li>
+            <li><strong>Esc</strong> — Quit</li>
+          </ul>
+
+          <p style="margin-top: 1rem;">You can switch tabs while an agent is generating a response. Type and send messages in other lanes while one is loading.</p>
+
+          
+          <h3>Examples</h3>
+          <pre><code>deepcli multichat
+deepcli multichat --count 3
+deepcli multichat --project my-project
+deepcli multichat -p my-project --count 2</code></pre>
+        </section>
+
+        <footer>
+          <p>DeepCLI — Configuration saved to <code>~\.deepcli\deepcli.toml</code></p>
+          <p style="margin-top: 0.5rem;">Projects and chat history saved to <code>~\.deepcli\projects\</code></p>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Smooth scroll and active link highlighting
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Highlight active section in sidebar
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (scrollY >= sectionTop - 200) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
