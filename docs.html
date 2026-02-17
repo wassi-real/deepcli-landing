@@ -613,6 +613,32 @@ deepcli multichat -p my-project --count 2</code></pre>
           <h3>Stop an expose server</h3>
           <pre><code>deepcli stop expose --project &lt;project-name&gt;</code></pre>
 
+          <h3>Run expose 24/7 (Linux / VPS)</h3>
+          <p>Closing your terminal stops the server. To keep it running forever, use these 3 steps (one-time setup).</p>
+          <p><strong>1.</strong> Create the service file. Run:</p>
+          <pre><code>mkdir -p ~/.config/systemd/user
+nano ~/.config/systemd/user/deepcli-expose.service</code></pre>
+          <p>Paste this (change <code>my-project</code> to your project name). Save: Ctrl+O, Enter, Ctrl+X.</p>
+          <pre><code>[Unit]
+Description=DeepCLI expose server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/deepcli expose --project my-project --port 8787
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target</code></pre>
+          <p><strong>2.</strong> Turn it on and start it:</p>
+          <pre><code>systemctl --user daemon-reload
+systemctl --user enable deepcli-expose.service
+systemctl --user start deepcli-expose.service</code></pre>
+          <p><strong>3.</strong> On a VPS, so it runs when you’re logged out:</p>
+          <pre><code>loginctl enable-linger $USER</code></pre>
+          <p>Done. Expose runs 24/7 and restarts after reboot.</p>
+
           <h3>Endpoints</h3>
           <ul>
             <li><strong>GET /</strong> — Server info (project, agent, model).</li>
