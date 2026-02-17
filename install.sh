@@ -13,9 +13,17 @@ RELEASE_ZIP="DeepCLI-${VERSION}.zip"
 RELEASE_TAR="DeepCLI-${VERSION}.tar.gz"
 GITHUB_BASE="https://github.com/wassi-real/DeepCLI/releases/download/v${VERSION}"
 
-# Install to ~/.local/bin
-INSTALL_DIR="${HOME}/.local/bin"
-mkdir -p "$INSTALL_DIR"
+# Install to /usr/local/bin if we can (then it's on PATH everywhere, no config). Else ~/.local/bin.
+USE_SUDO=""
+if [ -w /usr/local/bin ] 2>/dev/null; then
+    INSTALL_DIR="/usr/local/bin"
+elif command -v sudo >/dev/null 2>&1; then
+    INSTALL_DIR="/usr/local/bin"
+    USE_SUDO="1"
+else
+    INSTALL_DIR="${HOME}/.local/bin"
+    mkdir -p "$INSTALL_DIR"
+fi
 
 echo "DeepCLI ${VERSION} installer"
 echo ""
@@ -81,7 +89,13 @@ if [ -z "$DEEPCLI_BIN" ]; then
     fi
 fi
 if [ -n "$DEEPCLI_BIN" ]; then
-    mv -f "$DEEPCLI_BIN" "${INSTALL_DIR}/deepcli"
+    if [ -n "$USE_SUDO" ]; then
+        sudo cp -f "$DEEPCLI_BIN" "${INSTALL_DIR}/deepcli"
+        sudo chmod +x "${INSTALL_DIR}/deepcli"
+    else
+        mv -f "$DEEPCLI_BIN" "${INSTALL_DIR}/deepcli"
+        chmod +x "${INSTALL_DIR}/deepcli"
+    fi
 fi
 if [ ! -f "${INSTALL_DIR}/deepcli" ]; then
     echo "deepcli binary not found in archive. Contents of archive:"
@@ -91,29 +105,28 @@ if [ ! -f "${INSTALL_DIR}/deepcli" ]; then
 fi
 rm -rf "$EXTRACT_TO"
 
-chmod +x "${INSTALL_DIR}/deepcli"
-
-# Add to PATH if not already
-SHELL_RC=""
-if [ -n "$ZSH_VERSION" ] || [ -n "$ZSH_NAME" ]; then
-    SHELL_RC="${HOME}/.zshrc"
-elif [ -n "$BASH_VERSION" ]; then
-    SHELL_RC="${HOME}/.bashrc"
-fi
-
-if [ -n "$SHELL_RC" ] && [ -f "$SHELL_RC" ]; then
+# Only add to PATH when using ~/.local/bin ( /usr/local/bin is already on PATH )
+if [ "$INSTALL_DIR" = "${HOME}/.local/bin" ]; then
+    PATH_LINE="export PATH=\"\${HOME}/.local/bin:\$PATH\""
+    SHELL_RC=""
+    for rc in "${HOME}/.bashrc" "${HOME}/.zshrc" "${HOME}/.profile"; do
+        if [ -f "$rc" ]; then
+            SHELL_RC="$rc"
+            break
+        fi
+    done
+    if [ -z "$SHELL_RC" ]; then
+        SHELL_RC="${HOME}/.profile"
+        touch "$SHELL_RC"
+    fi
     if ! grep -q '.local/bin' "$SHELL_RC" 2>/dev/null; then
         echo "" >> "$SHELL_RC"
         echo '# DeepCLI' >> "$SHELL_RC"
-        echo "export PATH=\"\${HOME}/.local/bin:\$PATH\"" >> "$SHELL_RC"
-        echo "Added ~/.local/bin to PATH in $SHELL_RC"
+        echo "$PATH_LINE" >> "$SHELL_RC"
     fi
-else
-    echo ""
-    echo "Add to your PATH: export PATH=\"\${HOME}/.local/bin:\$PATH\""
 fi
 
 echo ""
-echo "DeepCLI installed successfully!"
-echo "Open a new terminal and run: deepcli init"
+echo "DeepCLI installed successfully to $INSTALL_DIR"
+echo "Run: deepcli init"
 echo ""
