@@ -4,34 +4,34 @@
 
 $ErrorActionPreference = "Stop"
 $Version = "0.1.1"
+$AssetName = "DeepCLI-$Version.zip"
 $BaseUrl = "https://deepcli.org/releases/v$Version"
-$GitHubBase = "https://github.com/wassi-real/DeepCLI/releases/tag/v$Version"
-
-# Detect architecture
-$Arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "aarch64" } else { "x86_64" }
-$AssetName = "deepcli-$Version-windows-$Arch.zip"
-$Url = "$BaseUrl/$AssetName"
-$FallbackUrl = "$GitHubBase/$AssetName"
+$GitHubUrl = "https://github.com/wassi-real/DeepCLI/releases/download/v$Version/$AssetName"
 
 # Install directory: $env:LOCALAPPDATA\deepcli
 $InstallDir = Join-Path $env:LOCALAPPDATA "deepcli"
 $ZipPath = Join-Path $env:TEMP $AssetName
 
 Write-Host "DeepCLI $Version installer" -ForegroundColor Cyan
-Write-Host "Architecture: $Arch" -ForegroundColor Gray
 Write-Host ""
 
 try {
     Write-Host "Downloading $AssetName..." -ForegroundColor Yellow
     try {
-        Invoke-WebRequest -Uri $Url -OutFile $ZipPath -UseBasicParsing -MaximumRedirection 5
+        Invoke-WebRequest -Uri "$BaseUrl/$AssetName" -OutFile $ZipPath -UseBasicParsing -MaximumRedirection 5
     } catch {
-        Write-Host "Primary URL failed, trying GitHub Releases..." -ForegroundColor Yellow
-        Invoke-WebRequest -Uri $FallbackUrl -OutFile $ZipPath -UseBasicParsing -MaximumRedirection 5
+        Write-Host "Trying GitHub Releases..." -ForegroundColor Yellow
+        Invoke-WebRequest -Uri $GitHubUrl -OutFile $ZipPath -UseBasicParsing -MaximumRedirection 5
     }
 
     if (-not (Test-Path $ZipPath)) {
         throw "Download failed"
+    }
+
+    # Validate zip (avoid extracting HTML error pages)
+    $bytes = [System.IO.File]::ReadAllBytes($ZipPath)
+    if ($bytes.Length -lt 100 -or $bytes[0] -ne 0x50 -or $bytes[1] -ne 0x4B) {
+        throw "Downloaded file is not a valid zip (got $($bytes.Length) bytes). Check if release exists: https://github.com/wassi-real/DeepCLI/releases"
     }
 
     if (-not (Test-Path $InstallDir)) {
@@ -39,18 +39,17 @@ try {
     }
 
     Write-Host "Extracting to $InstallDir..." -ForegroundColor Yellow
-    Expand-Archive -Path $ZipPath -DestinationPath $InstallDir -Force
+    $ExtractTo = Join-Path $env:TEMP "deepcli-extract"
+    if (Test-Path $ExtractTo) { Remove-Item $ExtractTo -Recurse -Force }
+    Expand-Archive -Path $ZipPath -DestinationPath $ExtractTo -Force
     Remove-Item $ZipPath -Force -ErrorAction SilentlyContinue
 
-    # The zip contains deepcli-0.1.1-windows-x86_64/deepcli.exe - move to InstallDir
-    $ExtractedDir = Join-Path $InstallDir "deepcli-$Version-windows-$Arch"
-    if (Test-Path $ExtractedDir) {
-        $ExePath = Join-Path $ExtractedDir "deepcli.exe"
-        if (Test-Path $ExePath) {
-            Move-Item $ExePath $InstallDir -Force
-            Remove-Item $ExtractedDir -Recurse -Force -ErrorAction SilentlyContinue
-        }
+    # Find deepcli.exe (could be at root or in a subfolder like DeepCLI-0.1.1/)
+    $ExePath = Get-ChildItem -Path $ExtractTo -Filter "deepcli.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+    if ($ExePath) {
+        Copy-Item $ExePath $InstallDir -Force
     }
+    Remove-Item $ExtractTo -Recurse -Force -ErrorAction SilentlyContinue
 
     $DeepcliPath = Join-Path $InstallDir "deepcli.exe"
     if (-not (Test-Path $DeepcliPath)) {
