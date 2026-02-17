@@ -47,12 +47,16 @@ EXTRACT_TO=$(mktemp -d)
 FIRST_BYTES=$(head -c 2 "$TMP_FILE" | od -An -tx1 | tr -d ' \n')
 if [ "$FIRST_BYTES" = "504b" ]; then
     echo "Extracting archive..."
-    unzip -q -o "$TMP_FILE" -d "$EXTRACT_TO" || {
-        echo "Failed to extract zip. Is unzip installed?"
+    if command -v unzip >/dev/null 2>&1; then
+        unzip -q -o "$TMP_FILE" -d "$EXTRACT_TO"
+    elif command -v python3 >/dev/null 2>&1; then
+        python3 -m zipfile -e "$TMP_FILE" "$EXTRACT_TO"
+    else
+        echo "Need unzip or python3 to extract. Install with: apt-get install unzip   or   yum install unzip"
         rm -rf "$EXTRACT_TO"
         rm -f "$TMP_FILE"
         exit 1
-    }
+    fi
 elif [ "$FIRST_BYTES" = "1f8b" ]; then
     echo "Extracting archive..."
     tar xzf "$TMP_FILE" -C "$EXTRACT_TO"
