@@ -365,6 +365,7 @@
           <a href="#agent" class="nav-link">Agent Commands</a>
           <a href="#project" class="nav-link">Projects</a>
           <a href="#multichat" class="nav-link">Multichat</a>
+          <a href="#expose" class="nav-link">Expose</a>
         </div>
       </nav>
     </aside>
@@ -380,44 +381,41 @@
 
           <h2>Installation</h2>
 
-          <p>Download DeepCLI from GitHub Releases, then unzip and add the folder to your PATH.</p>
+          <h3>One-line install</h3>
+          <p>Run in a terminal — downloads and adds to PATH automatically:</p>
+          <p><strong>Windows (PowerShell):</strong></p>
+          <pre><code>irm -useb https://deepcli.org/install.ps1 | iex</code></pre>
+          <p style="margin-top: 0.5rem;"><em>Alternative:</em> <code>iwr -useb https://deepcli.org/install.ps1 | iex</code></p>
+          <p style="margin-top: 1rem;"><strong>macOS &amp; Linux:</strong></p>
+          <pre><code>curl -fsSL https://deepcli.org/install.sh | sh</code></pre>
+          <p style="margin-top: 0.5rem;"><em>With wget:</em> <code>wget -qO- https://deepcli.org/install.sh | sh</code></p>
+          <p style="margin-top: 1rem;">Then open a new terminal and run <code>deepcli init</code>.</p>
 
+          <h3>Manual install</h3>
+          <p>Download from GitHub Releases, then unzip and add the folder to your PATH.</p>
           <a href="https://github.com/wassi-real/DeepCLI/releases" target="_blank" rel="noopener" class="download-btn">Download from GitHub Releases</a>
-
           <div class="steps">
             <div class="step">
               <span class="step-number">1</span>
               <div class="step-title">Download and unzip</div>
               <p style="margin-top: 1rem;">
-                Click the button above to open <a href="https://github.com/wassi-real/DeepCLI/releases" target="_blank" rel="noopener">GitHub Releases</a>, download the Windows build (e.g. <code>deepcli-x.x.x-x86_64-pc-windows-msvc.zip</code>), and unzip it to a folder (e.g. <code>C:\deepcli</code>).
+                Download the build for your platform: Windows (<code>.zip</code>), Linux (<code>.tar.gz</code>), or macOS Intel/Apple Silicon (<code>.tar.gz</code>). Unzip to a folder (e.g. <code>C:\deepcli</code> on Windows, <code>~/.local/bin</code> on Linux/macOS).
               </p>
             </div>
-
             <div class="step">
               <span class="step-number">2</span>
-              <div class="step-title">Add the folder to PATH (Windows)</div>
+              <div class="step-title">Add to PATH</div>
               <p style="margin-top: 1rem;">
-                Add the unzipped folder to your PATH using environment variables so you can run <code>deepcli</code> from any terminal:
+                <strong>Windows:</strong> Add the folder to your user PATH via <code>sysdm.cpl</code> → Advanced → Environment Variables, or run: <code>setx PATH "%PATH%;C:\deepcli"</code> (replace <code>C:\deepcli</code> with your folder).
               </p>
-              <ul style="margin-top: 0.75rem;">
-                <li>Press <strong>Win + R</strong>, type <code>sysdm.cpl</code>, press Enter.</li>
-                <li>Open the <strong>Advanced</strong> tab → <strong>Environment Variables</strong>.</li>
-                <li>Under <strong>User variables</strong> (or System), select <strong>Path</strong> → <strong>Edit</strong>.</li>
-                <li>Click <strong>New</strong> and add the full path to the folder (e.g. <code>C:\deepcli</code>).</li>
-                <li>Click OK to close all dialogs. Open a <em>new</em> terminal for the change to apply.</li>
-              </ul>
-              <p style="margin-top: 1rem;">Or via Command Prompt (run as Administrator if needed):</p>
-              <pre><code>setx PATH "%PATH%;C:\deepcli"</code></pre>
-              <p style="margin-top: 0.5rem; font-size: 0.95rem; color: var(--text-muted);">Replace <code>C:\deepcli</code> with the path where you unzipped DeepCLI.</p>
+              <p style="margin-top: 0.75rem;">
+                <strong>Linux/macOS:</strong> Add to <code>~/.bashrc</code> or <code>~/.zshrc</code>: <code>export PATH="$HOME/.local/bin:$PATH"</code>
+              </p>
             </div>
-
             <div class="step">
               <span class="step-number">3</span>
-              <div class="step-title">Verify installation</div>
-              <p style="margin-top: 1rem;">
-                Open a new terminal and run:
-              </p>
-              <pre><code>deepcli --version</code></pre>
+              <div class="step-title">Verify</div>
+              <p style="margin-top: 1rem;">Open a new terminal and run: <code>deepcli --version</code></p>
             </div>
           </div>
         </section>
@@ -426,11 +424,21 @@
           <h2>Setup</h2>
           <p>Run <code>deepcli init</code> once to configure DeepCLI. You'll be prompted for:</p>
           <ul>
-            <li><strong>API key</strong> — Get one at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a>. Copy it and press Enter at the prompt to use clipboard if paste doesn't work.</li>
+            <li><strong>OpenRouter API key</strong> (required) — Get one at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a>. Copy it and press Enter at the prompt to use clipboard if paste doesn't work.</li>
             <li><strong>Model</strong> — Pick from the list or type a custom model name.</li>
+            <li><strong>Brave Search API key</strong> (optional) — For web search. Get one at <a href="https://api.search.brave.com/" target="_blank">api.search.brave.com</a>. Press Enter to skip.</li>
+            <li><strong>Custom API keys</strong> (optional) — Add name/value pairs for other integrations; the AI can use them via tools. You can skip or add later in <code>deepcli.toml</code>.</li>
             <li><strong>Agent name</strong> — Name your first agent (e.g., <code>assistant</code>).</li>
           </ul>
           <pre><code>deepcli init</code></pre>
+          <p>Config is saved to <code>~/.deepcli/deepcli.toml</code>. You can edit <code>brave_search_api_key</code> and <code>[custom_api_keys]</code> there anytime.</p>
+
+          <h3>Web search and custom integrations</h3>
+          <p>When configured, the AI can use:</p>
+          <ul>
+            <li><strong>Web search</strong> — If you set a Brave Search API key, the agent can call <code>web_search</code> to look up current info online.</li>
+            <li><strong>Custom API keys</strong> — Keys added under <code>[custom_api_keys]</code> can be used via the <code>api_request</code> tool (Bearer auth). The agent can call <code>list_api_keys</code> to see which keys are available.</li>
+          </ul>
         </section>
 
         <section id="commands">
@@ -439,7 +447,7 @@
           <div class="cmd-grid">
             <div class="cmd">
               <span class="cmd-name">deepcli init</span>
-              <span class="cmd-desc">Set up DeepCLI (API key, model, first agent). Run this first.</span>
+              <span class="cmd-desc">Set up DeepCLI (OpenRouter key, model, optional Brave/custom API keys, first agent). Run this first.</span>
             </div>
 
             <div class="cmd">
@@ -460,6 +468,11 @@
             <div class="cmd">
               <span class="cmd-name">deepcli model</span>
               <span class="cmd-desc">Interactively change the model for an agent.</span>
+            </div>
+
+            <div class="cmd">
+              <span class="cmd-name">deepcli expose --project NAME [--agent A] [--port P]</span>
+              <span class="cmd-desc">Expose a project's AI as a local HTTP server with programmatic endpoints (e.g. POST /chat/ai).</span>
             </div>
           </div>
         </section>
@@ -573,6 +586,49 @@
 deepcli multichat --count 3
 deepcli multichat --project my-project
 deepcli multichat -p my-project --count 2</code></pre>
+        </section>
+
+        <section id="expose">
+          <h2>Expose</h2>
+          <p>Expose a project's AI agent as a local HTTP server so you can access it programmatically via REST endpoints. Useful for building apps, scripts, or integrations that chat with your AI.</p>
+
+          <h3>Usage</h3>
+          <pre><code>deepcli expose --project &lt;project-name&gt; [--agent &lt;agent&gt;] [--port 8787] [--key &lt;bearer-key&gt;] [--config &lt;path&gt;]</code></pre>
+
+          <ul>
+            <li><code>--project</code> (required) — Project to expose (must exist).</li>
+            <li><code>--agent</code> — Agent to use; defaults to your first agent.</li>
+            <li><code>--port</code> — Port to bind; defaults to 8787.</li>
+            <li><code>--key</code> — Optional bearer key; when set, clients must send <code>Authorization: Bearer &lt;key&gt;</code>.</li>
+            <li><code>--config</code> — Explicit config path; use if expose loads the wrong config (e.g. different user context).</li>
+          </ul>
+
+          <h3>401 "User not found" troubleshooting</h3>
+          <p>If expose returns <code>API error (401 Unauthorized): User not found</code> while normal chat works, the config path may resolve differently when expose runs as a long-lived process. Try:</p>
+          <ul>
+            <li><strong>Set API key via env:</strong> <code>DEEPCI_API_KEY</code> or <code>OPENROUTER_API_KEY</code> — these override the config key and are checked on each request.</li>
+            <li><strong>Point to your config:</strong> <code>deepcli expose --project X --config C:\Users\YourName\.deepcli\deepcli.toml</code></li>
+          </ul>
+
+          <h3>Stop an expose server</h3>
+          <pre><code>deepcli stop expose --project &lt;project-name&gt;</code></pre>
+
+          <h3>Endpoints</h3>
+          <ul>
+            <li><strong>GET /</strong> — Server info (project, agent, model).</li>
+            <li><strong>POST /chat/ai</strong> — Send a message, get AI response. Body: <code>{"message": "your message"}</code>. Response: <code>{"response": "AI reply"}</code>.</li>
+          </ul>
+
+          <h3>Example</h3>
+          <pre><code># Start server
+deepcli expose --project my-project --port 8787
+
+# In another terminal or from your app:
+curl -X POST http://127.0.0.1:8787/chat/ai \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hello!"}'</code></pre>
+
+          <p>The server binds to <code>0.0.0.0</code> so it's reachable from other machines on your network. Chat history is saved to the project.</p>
         </section>
 
         <footer>
