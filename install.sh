@@ -8,18 +8,10 @@ set -e
 VERSION="0.1.1"
 # Base URL after version: https://deepcli.org/releases/v0.1.1/
 BASE_URL="https://deepcli.org/releases/v${VERSION}"
-# File at that base URL (e.g. DeepCLI-0.1.1.tar.gz)
-RELEASE_FILE="DeepCLI-${VERSION}.tar.gz"
+# Single release file: zip (contains both deepcli and deepcli.exe) or fallback tar.gz
+RELEASE_ZIP="DeepCLI-${VERSION}.zip"
+RELEASE_TAR="DeepCLI-${VERSION}.tar.gz"
 GITHUB_BASE="https://github.com/wassi-real/DeepCLI/releases/download/v${VERSION}"
-
-# Detect OS and arch for platform-specific asset (Linux/macOS only)
-OS=""; ARCH=""
-case "$(uname -s)" in Linux) OS="linux";; Darwin) OS="darwin";; *) OS="";; esac
-case "$(uname -m)" in x86_64|amd64) ARCH="x86_64";; aarch64|arm64) ARCH="aarch64";; *) ARCH="";; esac
-PLATFORM_ASSET=""
-if [ -n "$OS" ] && [ -n "$ARCH" ]; then
-    PLATFORM_ASSET="deepcli-${VERSION}-${OS}-${ARCH}.tar.gz"
-fi
 
 # Install to ~/.local/bin
 INSTALL_DIR="${HOME}/.local/bin"
@@ -28,21 +20,19 @@ mkdir -p "$INSTALL_DIR"
 echo "DeepCLI ${VERSION} installer"
 echo ""
 
-# Download: try platform-specific first (Linux/macOS), then generic
+# Download: try zip first (mixed exe + native binary), then tar.gz
 TMP_FILE=$(mktemp)
 DOWNLOADED=""
-if [ -n "$PLATFORM_ASSET" ]; then
-    if curl -fsSL -o "$TMP_FILE" "${BASE_URL}/${PLATFORM_ASSET}" 2>/dev/null; then
-        DOWNLOADED="deepcli.org (${OS}-${ARCH})"
-    elif curl -fsSL -L -o "$TMP_FILE" "${GITHUB_BASE}/${PLATFORM_ASSET}" 2>/dev/null; then
-        DOWNLOADED="GitHub (${OS}-${ARCH})"
-    fi
+if curl -fsSL -o "$TMP_FILE" "${BASE_URL}/${RELEASE_ZIP}" 2>/dev/null; then
+    DOWNLOADED="deepcli.org"
+elif curl -fsSL -L -o "$TMP_FILE" "${GITHUB_BASE}/${RELEASE_ZIP}" 2>/dev/null; then
+    DOWNLOADED="GitHub"
 fi
 if [ -z "$DOWNLOADED" ]; then
-    if curl -fsSL -o "$TMP_FILE" "${BASE_URL}/${RELEASE_FILE}" 2>/dev/null; then
-        DOWNLOADED="deepcli.org (generic)"
-    elif curl -fsSL -L -o "$TMP_FILE" "${GITHUB_BASE}/${RELEASE_FILE}" 2>/dev/null; then
-        DOWNLOADED="GitHub (generic)"
+    if curl -fsSL -o "$TMP_FILE" "${BASE_URL}/${RELEASE_TAR}" 2>/dev/null; then
+        DOWNLOADED="deepcli.org"
+    elif curl -fsSL -L -o "$TMP_FILE" "${GITHUB_BASE}/${RELEASE_TAR}" 2>/dev/null; then
+        DOWNLOADED="GitHub"
     fi
 fi
 if [ -z "$DOWNLOADED" ]; then
@@ -52,17 +42,26 @@ if [ -z "$DOWNLOADED" ]; then
 fi
 echo "Downloaded from $DOWNLOADED"
 
-# Validate tar.gz (first bytes should be 1f 8b for gzip)
-if ! head -c 2 "$TMP_FILE" | od -An -tx1 | grep -q '1f 8b'; then
-    echo "Downloaded file is not a valid tar.gz. Check if release exists: https://github.com/wassi-real/DeepCLI/releases"
+# Detect archive type: PK = zip, 1f 8b = gzip
+EXTRACT_TO=$(mktemp -d)
+FIRST_BYTES=$(head -c 2 "$TMP_FILE" | od -An -tx1 | tr -d ' \n')
+if [ "$FIRST_BYTES" = "504b" ]; then
+    echo "Extracting archive..."
+    unzip -q -o "$TMP_FILE" -d "$EXTRACT_TO" || {
+        echo "Failed to extract zip. Is unzip installed?"
+        rm -rf "$EXTRACT_TO"
+        rm -f "$TMP_FILE"
+        exit 1
+    }
+elif [ "$FIRST_BYTES" = "1f8b" ]; then
+    echo "Extracting archive..."
+    tar xzf "$TMP_FILE" -C "$EXTRACT_TO"
+else
+    echo "Downloaded file is not a supported archive (zip or tar.gz)."
+    rm -rf "$EXTRACT_TO"
     rm -f "$TMP_FILE"
     exit 1
 fi
-
-# Extract
-echo "Extracting to ${INSTALL_DIR}..."
-EXTRACT_TO=$(mktemp -d)
-tar xzf "$TMP_FILE" -C "$EXTRACT_TO"
 rm -f "$TMP_FILE"
 
 # Find native binary "deepcli" or "DeepCLI" (no .exe). On Linux/macOS we must not use deepcli.exe (Windows).
@@ -71,10 +70,8 @@ DEEPCLI_BIN=$(find "$EXTRACT_TO" \( -name "deepcli" -o -name "DeepCLI" \) -type 
 if [ -z "$DEEPCLI_BIN" ]; then
     EXE_BIN=$(find "$EXTRACT_TO" -name "deepcli.exe" -type f 2>/dev/null | head -1)
     if [ -n "$EXE_BIN" ]; then
-        echo "This archive contains the Windows build (deepcli.exe). On Linux/macOS you need the native build."
-        if [ -n "$PLATFORM_ASSET" ]; then
-            echo "Download the correct build from: ${GITHUB_BASE}/${PLATFORM_ASSET}"
-        fi
+        echo "This archive contains only the Windows build (deepcli.exe). The native Linux/macOS binary (deepcli) was not found."
+        echo "Ensure the release zip includes the deepcli binary: https://github.com/wassi-real/DeepCLI/releases"
         rm -rf "$EXTRACT_TO"
         exit 1
     fi
