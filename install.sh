@@ -42,17 +42,18 @@ EXTRACT_TO=$(mktemp -d)
 tar xzf "$TMP_FILE" -C "$EXTRACT_TO"
 rm -f "$TMP_FILE"
 
-# Find deepcli binary (could be at root or in subfolder like DeepCLI-0.1.1/)
-DEEPCLI_BIN=$(find "$EXTRACT_TO" -name "deepcli" -type f 2>/dev/null | head -1)
+# Find deepcli binary (name may be deepcli or DeepCLI; could be at root or in subfolder)
+DEEPCLI_BIN=$(find "$EXTRACT_TO" -iname "deepcli" -type f 2>/dev/null | head -1)
 if [ -n "$DEEPCLI_BIN" ]; then
     mv -f "$DEEPCLI_BIN" "${INSTALL_DIR}/deepcli"
 fi
-rm -rf "$EXTRACT_TO"
-
 if [ ! -f "${INSTALL_DIR}/deepcli" ]; then
-    echo "deepcli binary not found in archive"
+    echo "deepcli binary not found in archive. Contents of archive:"
+    find "$EXTRACT_TO" -type f 2>/dev/null | while read -r f; do echo "  $f"; done
+    rm -rf "$EXTRACT_TO"
     exit 1
 fi
+rm -rf "$EXTRACT_TO"
 
 chmod +x "${INSTALL_DIR}/deepcli"
 
