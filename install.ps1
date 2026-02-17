@@ -5,7 +5,7 @@
 $ErrorActionPreference = "Stop"
 $Version = "0.1.1"
 $BaseUrl = "https://deepcli.org/releases/v$Version"
-$GitHubBase = "https://github.com/wassi-real/DeepCLI/releases/download/v$Version"
+$GitHubBase = "https://github.com/wassi-real/DeepCLI/releases/tag/v$Version"
 
 # Detect architecture
 $Arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "aarch64" } else { "x86_64" }

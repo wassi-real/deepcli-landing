@@ -7,7 +7,7 @@ set -e
 
 VERSION="0.1.1"
 BASE_URL="https://deepcli.org/releases/v${VERSION}"
-GITHUB_BASE="https://github.com/wassi-real/DeepCLI/releases/download/v${VERSION}"
+GITHUB_BASE="https://github.com/wassi-real/DeepCLI/releases/tag/v${VERSION}"
 
 # Detect OS and arch
 OS=$(uname -s)
